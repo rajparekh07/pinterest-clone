@@ -7,8 +7,48 @@ const { unlink } = require("fs-extra");
 const Image = require("../models/Image");
 
 router.get("/", async (req, res, next) => {
-  const images = await Image.find();
-  res.render("index", { images });
+    
+    //Pagination
+    var perPage = 20
+    var page = req.query.page || 1
+    
+    Image
+        .find({})
+        .skip((perPage * page) - perPage)
+        .limit(perPage)
+        .exec(function (err, images) {
+            Image.count().exec(function (err, count) {
+                if (err) return next(err)
+                res.render("index", {
+                    images: images,
+                    current: page,
+                    pages: Math.ceil(count / perPage)
+                })
+            })
+        })
+    
+});
+
+router.get("/images", async (req, res, next) => {
+
+    //Pagination
+    var perPage = 20
+    var page = req.query.page || 1
+    
+    Image
+        .find({})
+        .skip((perPage * page) - perPage)
+        .limit(perPage)
+        .exec(function (err, images) {
+            Image.count().exec(function (err, count) {
+                if (err) return next(err)
+                res.render("index", {
+                    images: images,
+                    current: page,
+                    pages: Math.ceil(count / perPage)
+                })
+            })
+        })
 });
 
 router.get("/upload", (req, res, next) => {
@@ -33,10 +73,10 @@ router.post("/upload", async (req, res, next) => {
 });
 
 router.get("/image/:id", async (req, res) => {
-  const { id } = req.params;
-  const image = await Image.findById(id);
-  console.log(image);
-  res.render("profile", { image });
+    const { id } = req.params;
+    const image = await Image.findById(id);
+    console.log(image);
+    res.render("profile", { image });
 });
 
 router.get("/image/:id/delete", async (req, res) => {

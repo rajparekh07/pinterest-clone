@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -19,18 +19,19 @@
                                         <h5 class="card-title">
                                           <%= image.title %>
                                         </h5>
-                                        <p class="card-text">
+                                        <p id="desc" class="card-text">
                                           <%= image.description %>
                                         </p>
+                                        <textarea id="desc-edit" name="description" class="form-control" placeholder="Description" style="display:none"><%= image.description %></textarea>
                                         <p class="card-text">
                                           <%= image.created_at %>
                                         </p>
                                         <p class="card-text">
                                           <%= format(image.created_at) %>
                                         </p>
-                                        <a href="/image/<%= image._id %>/delete" class="btn btn-danger btn-block"
-                                          >Delete Image</a
-                                        >
+                                        <a href="/image/<%= image._id %>" class="btn btn-primary" id="edit-btn">Edit</a>
+                                        <a href="/image/<%= image._id %>/delete" class="btn btn-danger">Delete Image</a>
+                                        <a href="/image/<%= image._id %>" class="btn btn-success" id="done-btn" style="visibility:hidden">Done</a>
                                       </div>
                              
                                   </div>
@@ -39,5 +40,29 @@
                   
 
                 </div>
+            </div>
+      <script type="text/javascript">
+          var isEditing = false;
+          var editButton = document.getElementById("edit-btn");
+          var doneButton = document.getElementById("done-btn");
+          var description = document.getElementById("desc");
+          var descriptionBox = document.getElementById("desc-edit");
+
+          editButton.addEventListener("click", function (e) {
+              e.preventDefault();
+              isEditing = true;
+              console.log("btn-clicked");
+              descriptionBox.style.display = "block";
+              description.style.display = "none";
+              doneButton.style.visibility = "visible";
+          });
+
+          doneButton.addEventListener("click", function (e) {
+              e.preventDefault();
+              descriptionBox.style.display = "none";
+              description.style.display = "block";
+              doneButton.style.visibility = "hidden";
+          });
+      </script>
   </body>
 </html>
