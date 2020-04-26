@@ -9,71 +9,112 @@
 </head>
 <body>
     <%- include("partials/navigation") %>
-    <div class="container p-4">
+    <div class="container p-4" id="el">
         <div class="row">
             <div class="col-md-4 offset-md-4">
                 <div class="card">
                     <div class="card-body">
-                        <form id="upload-widget" method="POST" action="/upload" class="dropzone" enctype="multipart/form-data">
+                        <!-- <form id="upload-widget" method="POST" action="/upload" class="dropzone" enctype="multipart/form-data">
                             <div class="fallback">
                                 <input name="image" type="file" multiple />
                             </div>
-                        </form>
-                        <button type="submit" id="submit-btn" class="btn btn-success btn-block mt-2">
+                        </form> -->
+
+                        <vue-dropzone ref="myVueDropzone" id="dropzone"
+                        @vdropzone-file-added="onFileAdded"
+                        @vdropzone-removed-file="onFileRemoved"
+
+                        :options="dropzoneOptions"
+                        :duplicate-check="true">
+                        </vue-dropzone>
+                        <button type="submit" id="submit-btn" class="btn btn-success btn-block mt-2" @click="uploadImages">
                             Upload
                         </button>
                     </div>
                 </div>
             </div>
         </div>
+        <hr>
+        <div class="row" v-for="image in images">
+            <img :src="image.dataURL" alt="">
+            {{ image.name }}
+        </div>
     </div>
     <script type="text/javascript">
-
+        new Vue({
+            el: '#el',
+            components: {
+                vueDropzone: vue2Dropzone
+            },
+            data: {
+                dropzoneOptions: {
+                    url: '/upload',
+                    paramName: "image",
+                    acceptedFiles: 'image/*',
+                    autoProcessQueue: false,
+                    addRemoveLinks: true
+                },
+                images: []
+            },
+            methods: {
+                uploadImages () {
+                    this.$refs.myVueDropzone.processQueue();
+                },
+                onFileAdded (file) {
+                    console.log(file)
+                    this.images.push(file)
+                },
+                onFileRemoved (file) {
+                    this.images = this.images.filter(x=>x.dataURL === file.dataURL)
+                }
+                
+            }
+            
+        })
         //var previewNode = document.querySelector("#upload-widget");
         //previewNode.id = "";
         //var previewTemplate = previewNode.parentNode.innerHTML;
         //previewNode.parentNode.removeChild(previewNode);
 
-        Dropzone.options.uploadWidget = {
-            paramName: "image",
-            addRemoveLinks: true,
-            autoProcessQueue: false,
-            maxFiles: 50,
-            parallelUploads: 50,
-            dictDefaultMessage: "Click or drop files here to upload",
-            acceptedFiles: 'image/*',
-            init: function () {
-                let mDropzone = this;
-                document.getElementById("submit-btn").addEventListener("click", function (e) {
-                    e.preventDefault();
-                    mDropzone.processQueue();
-                });
+        // Dropzone.options.uploadWidget = {
+        //     paramName: "image",
+        //     addRemoveLinks: true,
+        //     autoProcessQueue: false,
+        //     maxFiles: 50,
+        //     parallelUploads: 50,
+        //     dictDefaultMessage: "Click or drop files here to upload",
+        //     init: function () {
+        //         let mDropzone = this;
+        //         document.getElementById("submit-btn").addEventListener("click", function (e) {
+        //             e.preventDefault();
+        //             mDropzone.processQueue();
+        //         });
 
-                this.on('addedfile', function (file, resp) {
-                    //title = file.title == undefined ? "" : file.title;
-                    //file._titleBox = Dropzone.createElement("<input  id='title' type='text' name='title'  value=" + title + " >");
-                    //file.previewElement.appendChild(file._titleBox);
-                });
-                this.on("sendingmultiple", function (file, xhr, formData) {
-                    //var str = file.previewElement.querySelector("#title").value;
-                    //formData.append("title", str);
-                });
+        //         this.on('addedfile', function (file, resp) {
+        //             //title = file.title == undefined ? "" : file.title;
+        //             //file._titleBox = Dropzone.createElement("<input  id='title' type='text' name='title'  value=" + title + " >");
+        //             //file.previewElement.appendChild(file._titleBox);
+        //         });
+        //         this.on("sendingmultiple", function (file, xhr, formData) {
+        //             //var str = file.previewElement.querySelector("#title").value;
+        //             //formData.append("title", str);
+        //         });
 
-                this.on('success', function (file, resp) {
-                    console.log(file);
-                    console.log(resp);
-                });
-                this.on('thumbnail', function (file) {
-                    file.acceptDimensions();
-                });
-                this.on("complete", function (file) {
-                    this.removeFile(file);
-                });
-            },
-            accept: function (file, done) {
-                file.acceptDimensions = done;
-            }
-        };
+        //         this.on('success', function (file, resp) {
+        //             console.log(file);
+        //             console.log(resp);
+        //         });
+        //         this.on('thumbnail', function (file) {
+        //             file.acceptDimensions();
+        //         });
+        //         this.on("complete", function (file) {
+        //             this.removeFile(file);
+        //         });
+        //     },
+        //     accept: function (file, done) {
+        //         file.acceptDimensions = done;
+        //     }
+        // };
     </script>
 </body>
 </html>
