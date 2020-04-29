@@ -1,0 +1,37 @@
+
+  .dz-preview {
+    width: 160px;
+    display: inline-block;
+    margin: 5px;
+  }
+ .dz-preview .dz-image {
+    width: 80px;
+    height: 80px;
+    margin-left: 40px;
+    margin-bottom: 10px;
+  }
+ .dz-preview .dz-image > div {
+    width: inherit;
+    height: inherit;
+    border-radius: 50%;
+    background-size: contain;
+  }
+.dz-preview .dz-image > img {
+    width: 100%;
+  }
+
+.dz-preview .dz-details {
+    color: black;
+    
+    transition: opacity .2s linear;
+    text-align: center;
+  }
+  #customdropzone .dz-success-mark, .dz-error-mark, .dz-remove {
+    display: none;
+  } 
+
+  .dz-filename {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }

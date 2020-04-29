@@ -11,7 +11,7 @@
     <%- include("partials/navigation") %>
     <div class="container p-4" id="el">
         <div class="row">
-            <div class="col-md-4 offset-md-4">
+            <div class="col-md-12">
                 <div class="card">
                     <div class="card-body">
                         <!-- <form id="upload-widget" method="POST" action="/upload" class="dropzone" enctype="multipart/form-data">
@@ -20,24 +20,64 @@
                             </div>
                         </form> -->
 
-                        <vue-dropzone ref="myVueDropzone" id="dropzone"
-                        @vdropzone-file-added="onFileAdded"
-                        @vdropzone-removed-file="onFileRemoved"
-
+                        <vue-dropzone ref="myVueDropzone" 
+                        :use-custom-slot="true"
                         :options="dropzoneOptions"
+                        :include-styling="false"
+                        v-on:vdropzone-sending="sendingEvent"
+                        v-on:vdropzone-thumbnail="thumbnail"
+                        id="customdropzone"
                         :duplicate-check="true">
+                        <div id="customdropzone" class="vue-dropzone dropzone dz-clickable"><div class="dz-message">Drop files here to upload</div></div>
+                        <br>
                         </vue-dropzone>
-                        <button type="submit" id="submit-btn" class="btn btn-success btn-block mt-2" @click="uploadImages">
-                            Upload
-                        </button>
+                        
                     </div>
                 </div>
             </div>
+
+            <!-- <div class="col-md-6 offset-md-1" v-for="image in images">
+                <div class="card" >
+                    <div class="row no-gutters">
+                        <div class="col-md-4">
+                            <img :src="image.dataURL" class="card-img" alt="...">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ image.name }}</h5>
+                                  <form>
+                                      <div class="row">
+                                          <div class="col">
+                                              <input type="text" class="form-control form-control-sm" placeholder="Title">
+                                          </div>
+                                      </div>
+                                      <br>
+                                      <div class="row">
+                                          <div class="col">
+                                              <input type="text" class="form-control form-control-sm" placeholder="Description">
+                                          </div>
+                                      </div>
+                                      <br>
+                                      <div class="row">
+                                      <div class="col">
+                                          <input type="text" class="form-control form-control-sm" placeholder="Category">
+                                      </div>
+                                  </div>
+                                     
+                                  </form>
+                              </div>
+                        </div>
+                    </div>
+                  </div>
+                
+            </div> -->
         </div>
         <hr>
-        <div class="row" v-for="image in images">
-            <img :src="image.dataURL" alt="">
-            {{ image.name }}
+        
+        <div class="row">
+            <button type="submit" id="submit-btn" class="btn btn-success btn-block mt-2" @click="uploadImages">
+                Upload
+            </button>
         </div>
     </div>
     <script type="text/javascript">
@@ -52,7 +92,46 @@
                     paramName: "image",
                     acceptedFiles: 'image/*',
                     autoProcessQueue: false,
-                    addRemoveLinks: true
+                    addRemoveLinks: true,
+                    thumbnailWidth: 200,
+                    previewTemplate: `
+                        <div class="dz-preview dz-file-preview">
+                            <div class="dz-image">
+                                <div data-dz-thumbnail-bg></div>
+                            </div>
+                            <div class="dz-details">
+                                <div class="dz-size"><span data-dz-size></span></div>
+                                <div class="dz-filename"><span data-dz-name></span></div>
+                                
+                            </div>
+                            <form>
+                                    <br>
+                                      <div class="row">
+                                          <div class="col">
+                                              <input type="text" data-dz-title class="form-control form-control-sm" placeholder="Title">
+                                          </div>
+                                      </div>
+                                      <br>
+                                      <div class="row">
+                                          <div class="col">
+                                              <input type="text" data-dz-desc class="form-control form-control-sm" placeholder="Description">
+                                          </div>
+                                      </div>
+                                      <br>
+                                      <div class="row">
+                                      <div class="col">
+                                          <input type="text" data-dz-category class="form-control form-control-sm" placeholder="Category">
+                                      </div>
+                                  </div>
+                                     
+                                  </form>
+                            
+                            <div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
+                            <div class="dz-error-message"><span data-dz-errormessage></span></div>
+                            <div class="dz-success-mark"><i class="fa fa-check"></i></div>
+                            <div class="dz-error-mark"><i class="fa fa-close"></i></div>
+                        </div>
+                        `
                 },
                 images: []
             },
@@ -60,13 +139,42 @@
                 uploadImages () {
                     this.$refs.myVueDropzone.processQueue();
                 },
-                onFileAdded (file) {
+                
+                sendingEvent (file, xhr, formData) {
                     console.log(file)
-                    this.images.push(file)
+                    let title = document.getElementById(`${file.upload.uuid}_title`).value
+                    let desc = document.getElementById(`${file.upload.uuid}_desc`).value
+                    formData.append('title', title);
+                    formData.append('description', desc);
                 },
-                onFileRemoved (file) {
-                    this.images = this.images.filter(x=>x.dataURL === file.dataURL)
+                template: function () {
+                    return `
+                    `;
+                },
+                thumbnail: function(file, dataUrl) {
+                var j, len, ref, thumbnailElement;
+                if (file.previewElement) {
+                    file.previewElement.classList.remove("dz-file-preview");
+                    // $(file.previewElement).attr("id", file.upload.uuid)
+                    file.previewElement.querySelectorAll("[data-dz-title]")[0].id = file.upload.uuid + "_title"
+                    file.previewElement.querySelectorAll("[data-dz-desc]")[0].id = file.upload.uuid + "_desc"
+                    file.previewElement.querySelectorAll("[data-dz-category]")[0].id = file.upload.uuid + "_category"
+                    ref = file.previewElement.querySelectorAll("[data-dz-thumbnail-bg]");
+                    for (j = 0, len = ref.length; j < len; j++) {
+                        thumbnailElement = ref[j];
+                        thumbnailElement.alt = file.name;
+                        thumbnailElement.style.backgroundImage = 'url("' + dataUrl + '")';
+                    }
+                    return setTimeout(
+                        (
+                        (function(_this) {
+                            return function() {
+                                return file.previewElement.classList.add("dz-image-preview");
+                            };
+                        })(this)
+                    ), 1);
                 }
+                },
                 
             }
             
