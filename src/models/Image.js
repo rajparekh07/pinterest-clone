@@ -8,6 +8,7 @@ const imageSchema = new Schema({
   filename: String,
   path: String,
   originalname: String,
+  category: String,
   mimetype: String,
   size: Number,
   created_at: {

@@ -2,7 +2,7 @@ const { Router } = require("express");
 const router = Router();
 
 const path = require("path");
-const { unlink } = require("fs-extra");
+const { unlink, mkdirSync, renameSync, existsSync } = require("fs-extra");
 
 const Image = require("../models/Image");
 
@@ -57,19 +57,29 @@ router.get("/upload", (req, res, next) => {
 
 router.post("/upload", async (req, res, next) => {
   const image = new Image();
+
+  let basePath = `src/public/img/uploads/`
+  let categoryDir = `${basePath}${req.body.category}`
+
   image.title = req.body.title;
   image.description = req.body.description;
   image.filename = req.file.filename;
-  image.path = "/img/uploads/" + req.file.filename;
+  image.category = req.body.category;
+
+  !existsSync(categoryDir) && mkdirSync(categoryDir)
+  renameSync(`${basePath}${req.file.filename}`, `${categoryDir}/${req.file.filename}`)
+
+  image.path = `img/uploads/${req.body.category}/${req.file.filename}`;
   image.originalname = req.file.originalname;
   image.mimetype = req.file.mimetype;
   image.size = req.file.size;
 
   await image.save();
+  
+  res.send(true);
 
-  res.redirect("/");
+//   res.redirect("/");
 
-  res.send("Uploaded");
 });
 
 router.get("/image/:id", async (req, res) => {
