@@ -14,55 +14,94 @@
                     <div class="col-md-4 offset-md-4">
                       
                                     <div class="card animated fadeInDown">
-                                      <img src="<%= image.path %>" class="card-img-top" />
+                                      <img src="/../<%= image.path %>" class="card-img-top" />
                                       <div class="card-body">
-                                        <h5 class="card-title">
+                                        <h5 id="og-title" class="card-title">
                                           <%= image.title %>
                                         </h5>
-                                        <p id="desc" class="card-text">
+                                        <input id="title-edit" name="title" class="form-control mb-2" placeholder="Title" style="display:none" value="<%= image.title %>"/>
+                                        <p id="og-desc" class="card-text">
                                           <%= image.description %>
                                         </p>
-                                        <textarea id="desc-edit" name="description" class="form-control" placeholder="Description" style="display:none"><%= image.description %></textarea>
+                                        <textarea id="desc-edit" name="description" class="form-control mb-2" placeholder="Description" style="display:none"><%= image.description %></textarea>
+                                        <p id="og-cat" class="card-text">
+                                          <kbd class="bg-primary"><%= image.category %></kbd>
+                                        </p>
+                                        <input id="cat-edit" name="cat" class="form-control mb-2" placeholder="Category" style="display:none" value="<%= image.category %>"/>
                                         <p class="card-text">
                                           <%= image.created_at %>
                                         </p>
                                         <p class="card-text">
                                           <%= format(image.created_at) %>
                                         </p>
-                                        <a href="/image/<%= image._id %>" class="btn btn-primary" id="edit-btn">Edit</a>
-                                        <a href="/image/<%= image._id %>/delete" class="btn btn-danger">Delete Image</a>
-                                        <a href="/image/<%= image._id %>" class="btn btn-success" id="done-btn" style="visibility:hidden">Done</a>
+                                        <div id="button-holder-1">
+                                            <button class="btn btn-primary" id="edit-btn">Edit</button>
+                                            <a href="/image/<%= image._id %>/delete" class="btn btn-danger">Delete Image</a>
+                                        </div>
+                                        <form action="/update" method="POST" enctype="multipart/form-data">
+                                            <input type="hidden" id="upd-id" name="upd_id" placeholder="ID" class="form-control" style="display:none" value="<%= image._id %>"/>
+                                            <input type="hidden" id="upd-title" name="upd_title" placeholder="Title" class="form-control" style="display:none" />
+                                            <input type="hidden" id="upd-desc" name="upd_desc" placeholder="Description" class="form-control" style="display:none" />
+                                            <input type="hidden" id="upd-cat" name="upd_cat" placeholder="Category" class="form-control" style="display:none" />
+                                            <div id="button-holder-2" style="display:none">
+                                                <button type="submit" class="btn btn-success" id="done-btn">Done</button>
+                                                <button class="btn btn-danger" id="cancel-btn">Cancel</button>
+                                            </div>
+                                        </form>
                                       </div>
-                             
                                   </div>
                     </div>
-
-                  
-
                 </div>
             </div>
       <script type="text/javascript">
-          var isEditing = false;
           var editButton = document.getElementById("edit-btn");
           var doneButton = document.getElementById("done-btn");
-          var description = document.getElementById("desc");
+          var cancelButton = document.getElementById("cancel-btn");
+
+          var buttonHolder1 = document.getElementById("button-holder-1");
+          var buttonHolder2 = document.getElementById("button-holder-2");
+
+          var title = document.getElementById("og-title");
+          var titleBox = document.getElementById("title-edit");
+          var description = document.getElementById("og-desc");
           var descriptionBox = document.getElementById("desc-edit");
+          var category = document.getElementById("og-cat");
+          var categoryBox = document.getElementById("cat-edit");
+          
+          var updatedTitle = document.getElementById("upd-title");
+          var updatedDescription = document.getElementById("upd-desc");
+          var updatedCategory = document.getElementById("upd-cat");
 
           editButton.addEventListener("click", function (e) {
               e.preventDefault();
-              isEditing = true;
-              console.log("btn-clicked");
+              titleBox.style.display = "block";
               descriptionBox.style.display = "block";
+              categoryBox.style.display = "block";
+              title.style.display = "none";
               description.style.display = "none";
-              doneButton.style.visibility = "visible";
+              category.style.display = "none";
+              buttonHolder1.style.display = "none";
+              buttonHolder2.style.display = "block";
           });
 
           doneButton.addEventListener("click", function (e) {
-              e.preventDefault();
+              //e.preventDefault();
+              titleBox.style.display = "none";
               descriptionBox.style.display = "none";
+              categoryBox.style.display = "none";
+              title.style.display = "block";
               description.style.display = "block";
-              doneButton.style.visibility = "hidden";
+              buttonHolder1.style.display = "block";
+              buttonHolder2.style.display = "none";
+              updateRecord();
           });
+          
+          function updateRecord() {
+              updatedTitle.value = titleBox.value;
+              updatedDescription.value = descriptionBox.value;
+              updatedCategory.value = categoryBox.value;
+          }
+
       </script>
   </body>
 </html>

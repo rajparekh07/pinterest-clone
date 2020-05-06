@@ -6,6 +6,9 @@ const { unlink, mkdirSync, renameSync, existsSync } = require("fs-extra");
 
 const Image = require("../models/Image");
 
+const mongoose = require('mongoose');
+const ImageModel = mongoose.model('Image');
+
 router.get("/", async (req, res, next) => {
     
     //Pagination
@@ -80,6 +83,20 @@ router.post("/upload", async (req, res, next) => {
 
 //   res.redirect("/");
 
+});
+
+router.post("/update", async (req, res, next) => {
+
+    const id = req.body.upd_id;
+    const title = req.body.upd_title;
+    const description = req.body.upd_desc;
+    const category = req.body.upd_cat;
+
+    var ObjectId = require('mongodb').ObjectId;
+
+    await ImageModel.updateOne({ _id: ObjectId(id) }, { $set: { title: title, description: description } }); //TODO update category
+
+    res.redirect("back");
 });
 
 router.get("/image/:id", async (req, res) => {
