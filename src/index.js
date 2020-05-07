@@ -2,7 +2,6 @@ const express = require("express");
 const path = require("path");
 const morgan = require("morgan");
 const multer = require("multer");
-const uuid = require("uuid");
 const { format } = require("timeago.js");
 // Initializations
 const app = express();
@@ -17,7 +16,13 @@ app.use(express.urlencoded({ extended: true }));
 const storage = multer.diskStorage({
   destination: path.join(__dirname, "public/img/uploads"),
   filename: (req, file, cb, filename) => {
-    cb(null, uuid() + path.extname(file.originalname));
+
+    //Naming Scheme
+    let getName = () => {
+      let now = new Date();
+      return  `PIC-${now.toLocaleDateString().replace(/\//g, "")}-${now.toLocaleTimeString().replace(/:| /g, "")}-${now.getMilliseconds()}`
+    }
+    cb(null, getName() + path.extname(file.originalname));
   }
 });
 app.use(multer({ storage: storage }).single("image"));
